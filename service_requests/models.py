@@ -29,4 +29,3 @@ class ServiceRequest(models.Model):
 
 class SupportRepresentative(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    assigned_requests = models.ManyToManyField(ServiceRequest, blank=True)
