@@ -12,10 +12,11 @@
     <header>
         <h1>Gas Utility Service</h1>
         <nav>
-            <a href="{% url 'list_service_requests  ' %}">My Requests</a>
-            <a href="{% url 'create_service_request' %}">Submit a Request</a>
+            <a href="{% url 'service_requests:list_service_requests' %}">My Requests</a>
+            <a href="{% url 'service_requests:create_service_request' %}">Submit a Request</a>
             <a href="{% url 'admin:index' %}">Admin</a>
         </nav>
+        
     </header>
     <main>
         {% block content %}{% endblock %}

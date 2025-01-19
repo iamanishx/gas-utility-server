@@ -13,7 +13,7 @@ class ServiceRequestCreateView(LoginRequiredMixin, CreateView):
     model = ServiceRequest
     form_class = ServiceRequestForm
     template_name = 'service_requests/create_service_request.html'
-    success_url = reverse_lazy('service_requests:list_service_requests')
+    success_url = reverse_lazy('list_service_requests')
 
     def form_valid(self, form):
         # Link the request to the currently logged-in customer's account
@@ -55,7 +55,7 @@ def signup(request):
             # Automatically create a customer profile for the new user
             Customer.objects.create(user=user)
             login(request, user)  # Log in the user after successful signup
-            return redirect('service_requests:list_service_requests')
+            return redirect('list_service_requests')
     else:
         form = UserCreationForm()
 
