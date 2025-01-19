@@ -1,31 +1,16 @@
-{% extends 'base.html' %}
-
+{% extends "base.html" %}
 {% block content %}
-  <h1>My Service Requests</h1>
-  {% if service_requests %}
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Request ID</th>
-          <th>Service Type</th>
-          <th>Status</th>
-          <th>Created At</th>
-          <th>Details</th>
-        </tr>
-      </thead>
-      <tbody>
+    <h2>Your Service Requests</h2>
+    <ul>
         {% for request in service_requests %}
-          <tr>
-            <td>{{ request.id }}</td>
-            <td>{{ request.get_service_type_display }}</td> {# Display human-readable choice #}
-            <td>{{ request.get_status_display }}</td> {# Display human-readable choice #}
-            <td>{{ request.created_at|date:"SHORT_DATETIME_FORMAT" }}</td>
-            <td><a href="{% url 'service_request_detail' request.pk %}" class="btn btn-sm btn-info">View</a></td>
-          </tr>
+            <li>
+                <a href="{% url 'service_request_detail' request.pk %}">
+                    {{ request.service_type }} - {{ request.status }}
+                </a>
+                (Submitted on {{ request.created_at }})
+            </li>
+        {% empty %}
+            <li>No service requests found.</li>
         {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p>You haven't submitted any service requests yet.</p>
-  {% endif %}
+    </ul>
 {% endblock %}
