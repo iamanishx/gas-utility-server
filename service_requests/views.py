@@ -8,7 +8,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 class ServiceRequestCreateView(LoginRequiredMixin, CreateView):
     model = ServiceRequest
     form_class = ServiceRequestForm
-    template_name = 'service_requests/create_service_request.html'
+    template_name = 'service_requests/create_service_requests.html'
     success_url = reverse_lazy('list_service_requests')  # Redirect to the request list upon success
 
     def form_valid(self, form):
@@ -25,8 +25,8 @@ class ServiceRequestListView(LoginRequiredMixin, ListView):
 
 class ServiceRequestDetailView(LoginRequiredMixin, DetailView):
     model = ServiceRequest
-    template_name = 'service_requests/service_request_detail.html'
-    context_object_name = 'service_request'
+    template_name = 'service_requests/service_requests_detail.html'
+    context_object_name = 'service_requests'
 
     def get_queryset(self):
         # Limit access to requests belonging to the logged-in customer
