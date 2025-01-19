@@ -12,6 +12,7 @@ urlpatterns = [
 from django.urls import path
 from . import views
 from django.shortcuts import redirect  # Import redirect function
+from django.contrib.auth.views import LogoutView
 
 
 # app_name = 'service_requests'
@@ -23,6 +24,7 @@ urlpatterns = [
     path('<int:pk>/', views.ServiceRequestDetailView.as_view(), name='service_request_detail'),
     path('signup/', views.signup, name='signup'),  
     path('support-dashboard/', views.support_dashboard, name='support_dashboard'),  # Support dashboard URL
-
-]
+    path('my-account/', views.my_account, name='my_account'),  # My Account page
+    
+    ]
 

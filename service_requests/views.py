@@ -80,3 +80,10 @@ def support_dashboard(request):
     return render(request, 'service_requests/support_dashboard.html', {
         'service_requests': service_requests
     })
+@login_required
+def my_account(request):
+    """
+    Display the details of the logged-in user's profile.
+    """
+    customer = request.user.customer  # Assuming the User is linked to a Customer profile
+    return render(request, 'service_requests/my_account.html', {'customer': customer})
