@@ -21,6 +21,8 @@ urlpatterns = [
     path('new/', views.ServiceRequestCreateView.as_view(), name='create_service_request'),
     path('service-requests/', views.ServiceRequestListView.as_view(), name='list_service_requests'),
     path('<int:pk>/', views.ServiceRequestDetailView.as_view(), name='service_request_detail'),
-    path('signup/', views.signup, name='signup'),  # Signup route
+    path('signup/', views.signup, name='signup'),  
+    path('support-dashboard/', views.support_dashboard, name='support_dashboard'),  # Support dashboard URL
+
 ]
 
