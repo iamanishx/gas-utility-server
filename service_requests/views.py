@@ -72,7 +72,7 @@ def support_dashboard(request):
     """
     if not request.user.is_staff:
         # Only allow staff members to access this page
-        return redirect('service_requests:list_service_requests')
+        return redirect('list_service_requests')
 
     # Get all service requests to display on the dashboard
     service_requests = ServiceRequest.objects.all().order_by('-created_at')
