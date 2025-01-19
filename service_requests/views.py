@@ -7,6 +7,10 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import ServiceRequest, Customer
 from .forms import ServiceRequestForm
+from django.contrib.auth.decorators import login_required
+from .models import ServiceRequest
+
+
 
 
 class ServiceRequestCreateView(LoginRequiredMixin, CreateView):
@@ -61,13 +65,18 @@ def signup(request):
 
     return render(request, 'registration/signup.html', {'form': form})
 
-
+@login_required
 def support_dashboard(request):
     """
     Displays a dashboard for support representatives to manage service requests.
     """
     if not request.user.is_staff:
+        # Only allow staff members to access this page
         return redirect('service_requests:list_service_requests')
 
+    # Get all service requests to display on the dashboard
     service_requests = ServiceRequest.objects.all().order_by('-created_at')
-    return render(request, 'service_requests/support_dashboard.html', {'service_requests': service_requests})
+    
+    return render(request, 'service_requests/support_dashboard.html', {
+        'service_requests': service_requests
+    })
