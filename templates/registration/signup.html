@@ -3,14 +3,24 @@
     <h2>Sign Up</h2>
     <form method="post" action="{% url 'signup' %}">
         {% csrf_token %}
-        <label for="username">Username:</label>
-        <input type="text" name="username" id="username" required>
+        
+        <label for="id_username">Username:</label>
+        {{ form.username }}
 
-        <label for="email">Email:</label>
-        <input type="email" name="email" id="email" required>
+        <label for="id_email">Email:</label>
+        {{ form.email }}
 
-        <label for="password">Password:</label>
-        <input type="password" name="password" id="password" required>
+        <label for="id_password1">Password:</label>
+        {{ form.password1 }}
+
+        <label for="id_password2">Confirm Password:</label>
+        {{ form.password2 }}
+
+        <label for="id_phone_number">Phone Number:</label>
+        {{ form.phone_number }}
+
+        <label for="id_address">Address:</label>
+        {{ form.address }}
 
         <button type="submit">Sign Up</button>
     </form>

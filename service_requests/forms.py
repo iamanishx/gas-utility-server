@@ -1,6 +1,8 @@
 from django import forms
 from .models import ServiceRequest
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
+
 
 class ServiceRequestForm(forms.ModelForm):
     class Meta:
@@ -16,3 +18,13 @@ class UserRegistrationForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['username', 'email', 'password']
+
+
+class CustomUserCreationForm(UserCreationForm):
+    email = forms.EmailField(required=True, help_text="Enter a valid email address.")
+    phone_number = forms.CharField(max_length=15, required=True, help_text="Enter your phone number.")
+    address = forms.CharField(widget=forms.Textarea, required=True, help_text="Enter your address.")
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password1', 'password2', 'phone_number', 'address')        
