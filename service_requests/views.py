@@ -104,13 +104,15 @@ def signup(request):
                 messages.error(request, "A user with this email already exists.")
                 return render(request, 'registration/signup.html', {'form': form})
             
-            # Create the user instance with password1 (hashed)
             user = form.save(commit=False)
             user.set_password(form.cleaned_data['password1'])  
             user.save()   
+            print("Form Data:", form.cleaned_data)
 
  
             if not Customer.objects.filter(user=user).exists():
+                 print("Phone Number:", form.cleaned_data.get('phone_number'))
+                 print("Address:", form.cleaned_data.get('address'))
                  Customer.objects.create(
                     user=user,
                     phone_number=form.cleaned_data['phone_number'],
