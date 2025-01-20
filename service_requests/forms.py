@@ -3,7 +3,17 @@ from .models import ServiceRequest
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
+class ServiceRequestForm(forms.ModelForm):
+    class Meta:
+        model = ServiceRequest
+        fields = ['service_type', 'description']
 
+
+class SupportResponseForm(forms.ModelForm):
+    class Meta:
+        model = ServiceRequest
+        fields = ['status', 'response']
+        
 class ServiceRequestForm(forms.ModelForm):
     class Meta:
         model = ServiceRequest

@@ -26,6 +26,7 @@ class ServiceRequest(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     resolved_at = models.DateTimeField(null=True, blank=True)
     attachments = models.FileField(upload_to='attachments/', blank=True, null=True)
+    response = models.TextField(null=True, blank=True)  # Add the response field here
 
 class SupportRepresentative(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
