@@ -12,6 +12,10 @@ from .models import ServiceRequest
 from .forms import CustomUserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import ListView
+from .forms import UserRegistrationForm
+from django.contrib import messages
+
+
 
 
 class SupportDashboardView(LoginRequiredMixin, UserPassesTestMixin, ListView):
@@ -20,14 +24,12 @@ class SupportDashboardView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     context_object_name = 'service_requests'
 
     def test_func(self):
-        # Only allow staff members to access this view
         return self.request.user.is_staff
 
     def get_queryset(self):
-        # Get all service requests for staff review
-        return ServiceRequest.objects.all().order_by('-created_at')
-
-
+        if self.request.user.is_staff:
+            return ServiceRequest.objects.all()   
+        
 # Allow Support Staff to Respond to Service Requests
 class ServiceRequestUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = ServiceRequest
@@ -36,11 +38,9 @@ class ServiceRequestUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateVi
     success_url = reverse_lazy('support_dashboard')
 
     def test_func(self):
-        # Restrict this view to staff members only
         return self.request.user.is_staff
 
     def form_valid(self, form):
-        # Handle the response or status update
         form.instance.last_updated_by = self.request.user
         return super().form_valid(form)
 
@@ -53,7 +53,6 @@ class ServiceRequestCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('list_service_requests')
 
     def form_valid(self, form):
-        # Link the request to the currently logged-in customer's account
         form.instance.customer = self.request.user.customer
         return super().form_valid(form)
 
@@ -64,7 +63,6 @@ class ServiceRequestListView(LoginRequiredMixin, ListView):
     context_object_name = 'service_requests'
 
     def get_queryset(self):
-        # Filter service requests based on the logged-in customer
         try:
             return ServiceRequest.objects.filter(customer=self.request.user.customer).order_by('-created_at')
         except AttributeError:
@@ -77,7 +75,6 @@ class ServiceRequestDetailView(LoginRequiredMixin, DetailView):
     context_object_name = 'service_request'
 
     def get_queryset(self):
-        # Restrict access to service requests owned by the logged-in customer
         return ServiceRequest.objects.filter(customer=self.request.user.customer)
     
 class ServiceRequestUpdateView(LoginRequiredMixin, UpdateView):
@@ -87,42 +84,51 @@ class ServiceRequestUpdateView(LoginRequiredMixin, UpdateView):
     context_object_name = 'service_request'
 
     def get_success_url(self):
-        return reverse_lazy('service_requests:list_service_requests')  # Redirect after successful update
+        return reverse_lazy('service_requests:list_service_requests')   
 
     def get_queryset(self):
-        return ServiceRequest.objects.filter(customer=self.request.user.customer)  # Ensure only the current user's requests can be updated
+        return ServiceRequest.objects.filter(customer=self.request.user.customer)   
 
 def signup(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            # Save the User instance
-            user = form.save()
-            user.email = request.POST.get('email', '')  # Add the email to the user instance
-            user.save()
+            username = form.cleaned_data['username']
+            email = form.cleaned_data['email']
+            
+            if User.objects.filter(username=username).exists():
+                messages.error(request, "A user with this username already exists.")
+                return render(request, 'registration/signup.html', {'form': form})
 
-            # Check if a Customer instance already exists for this User
+            if User.objects.filter(email=email).exists():
+                messages.error(request, "A user with this email already exists.")
+                return render(request, 'registration/signup.html', {'form': form})
+            
+            # Create the user instance with password1 (hashed)
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password1'])  
+            user.save()   
+
+ 
             if not Customer.objects.filter(user=user).exists():
-                # Create a new Customer instance
-                Customer.objects.create(
+                 Customer.objects.create(
                     user=user,
-                    phone_number=request.POST.get('phone_number', ''),
-                    address=request.POST.get('address', '')
+                    phone_number=form.cleaned_data['phone_number'],
+                    address=form.cleaned_data['address']
                 )
 
-            # Log in the user after signup
             login(request, user)
-            return redirect('list_service_requests')
+            return redirect('list_service_requests')   
     else:
-        form = UserCreationForm()
+        form = UserRegistrationForm()
 
     return render(request, 'registration/signup.html', {'form': form})
 
- 
 @login_required
 def my_account(request):
-    """
-    Display the details of the logged-in user's profile.
-    """
-    customer = request.user.customer  # Assuming the User is linked to a Customer profile
-    return render(request, 'service_requests/my_account.html', {'customer': customer})
+     
+    customer = request.user.customer  
+    return render(request, 'service_requests/my_account.html', {
+        'user': request.user,
+        'customer': customer,
+    })
