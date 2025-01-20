@@ -28,6 +28,5 @@ urlpatterns = [
     path('my-account/', views.my_account, name='my_account'),  # My Account page
     path('update/<int:pk>/', ServiceRequestUpdateView.as_view(), name='update_service_request'),
 
-    
-    ]
+]
 
