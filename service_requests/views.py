@@ -9,6 +9,8 @@ from .models import ServiceRequest, Customer
 from .forms import ServiceRequestForm
 from django.contrib.auth.decorators import login_required
 from .models import ServiceRequest
+from .forms import CustomUserCreationForm
+
 
 
 
@@ -49,16 +51,25 @@ class ServiceRequestDetailView(LoginRequiredMixin, DetailView):
 
 
 def signup(request):
-    """
-    Handles user registration.
-    """
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
+            # Save the User instance
             user = form.save()
-            # Automatically create a customer profile for the new user
-            Customer.objects.create(user=user)
-            login(request, user)  # Log in the user after successful signup
+            user.email = request.POST.get('email', '')  # Add the email to the user instance
+            user.save()
+
+            # Check if a Customer instance already exists for this User
+            if not Customer.objects.filter(user=user).exists():
+                # Create a new Customer instance
+                Customer.objects.create(
+                    user=user,
+                    phone_number=request.POST.get('phone_number', ''),
+                    address=request.POST.get('address', '')
+                )
+
+            # Log in the user after signup
+            login(request, user)
             return redirect('list_service_requests')
     else:
         form = UserCreationForm()
