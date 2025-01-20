@@ -1,34 +1,32 @@
 {% extends "base.html" %}
 {% block content %}
-    <h2>Support Dashboard</h2>
-    <p>Welcome, {{ user.username }}! Here are your assigned service requests:</p>
+<h2>Support Dashboard</h2>
+<p>Welcome, {{ user.username }}! Manage customer service requests below:</p>
 
-    {% if assigned_requests %}
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Service Type</th>
-                    <th>Status</th>
-                    <th>Created At</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for request in assigned_requests %}
-                    <tr>
-                        <td>{{ request.id }}</td>
-                        <td>{{ request.get_service_type_display }}</td>
-                        <td>{{ request.get_status_display }}</td>
-                        <td>{{ request.created_at|date:"Y-m-d H:i" }}</td>
-                        <td>
-                            <a href="{% url 'service_requests:service_request_detail' request.id %}">View</a>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>No assigned service requests at the moment.</p>
-    {% endif %}
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Customer</th>
+            <th>Service Type</th>
+            <th>Status</th>
+            <th>Created At</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for request in service_requests %}
+            <tr>
+                <td>{{ request.id }}</td>
+                <td>{{ request.customer.user.username }}</td>
+                <td>{{ request.get_service_type_display }}</td>
+                <td>{{ request.get_status_display }}</td>
+                <td>{{ request.created_at|date:"Y-m-d H:i" }}</td>
+                <td>
+                    <a href="{% url 'update_service_request' request.id %}">Respond</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

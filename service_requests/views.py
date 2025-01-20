@@ -1,4 +1,4 @@
-from django.views.generic import CreateView, ListView, DetailView
+from django.views.generic import CreateView, ListView, DetailView, UpdateView
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.contrib.auth import login
@@ -6,12 +6,43 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import ServiceRequest, Customer
-from .forms import ServiceRequestForm
+from .forms import ServiceRequestForm, SupportResponseForm
 from django.contrib.auth.decorators import login_required
 from .models import ServiceRequest
 from .forms import CustomUserCreationForm
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.views.generic import ListView
 
 
+class SupportDashboardView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = ServiceRequest
+    template_name = 'service_requests/support_dashboard.html'
+    context_object_name = 'service_requests'
+
+    def test_func(self):
+        # Only allow staff members to access this view
+        return self.request.user.is_staff
+
+    def get_queryset(self):
+        # Get all service requests for staff review
+        return ServiceRequest.objects.all().order_by('-created_at')
+
+
+# Allow Support Staff to Respond to Service Requests
+class ServiceRequestUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = ServiceRequest
+    form_class = SupportResponseForm
+    template_name = 'service_requests/update_service_request.html'
+    success_url = reverse_lazy('support_dashboard')
+
+    def test_func(self):
+        # Restrict this view to staff members only
+        return self.request.user.is_staff
+
+    def form_valid(self, form):
+        # Handle the response or status update
+        form.instance.last_updated_by = self.request.user
+        return super().form_valid(form)
 
 
 
@@ -48,7 +79,18 @@ class ServiceRequestDetailView(LoginRequiredMixin, DetailView):
     def get_queryset(self):
         # Restrict access to service requests owned by the logged-in customer
         return ServiceRequest.objects.filter(customer=self.request.user.customer)
+    
+class ServiceRequestUpdateView(LoginRequiredMixin, UpdateView):
+    model = ServiceRequest
+    form_class = SupportResponseForm
+    template_name = 'service_requests/update_service_request.html'
+    context_object_name = 'service_request'
 
+    def get_success_url(self):
+        return reverse_lazy('service_requests:list_service_requests')  # Redirect after successful update
+
+    def get_queryset(self):
+        return ServiceRequest.objects.filter(customer=self.request.user.customer)  # Ensure only the current user's requests can be updated
 
 def signup(request):
     if request.method == 'POST':
@@ -76,21 +118,7 @@ def signup(request):
 
     return render(request, 'registration/signup.html', {'form': form})
 
-@login_required
-def support_dashboard(request):
-    """
-    Displays a dashboard for support representatives to manage service requests.
-    """
-    if not request.user.is_staff:
-        # Only allow staff members to access this page
-        return redirect('list_service_requests')
-
-    # Get all service requests to display on the dashboard
-    service_requests = ServiceRequest.objects.all().order_by('-created_at')
-    
-    return render(request, 'service_requests/support_dashboard.html', {
-        'service_requests': service_requests
-    })
+ 
 @login_required
 def my_account(request):
     """

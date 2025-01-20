@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Update Service Request #{{ service_request.id }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit Response</button>
+</form>
+
+<h3>Current Request Details</h3>
+<p><strong>Customer:</strong> {{ service_request.customer.user.username }}</p>
+<p><strong>Service Type:</strong> {{ service_request.get_service_type_display }}</p>
+<p><strong>Description:</strong> {{ service_request.description }}</p>
+<p><strong>Status:</strong> {{ service_request.get_status_display }}</p>
+<p><strong>Created At:</strong> {{ service_request.created_at|date:"Y-m-d H:i" }}</p>
+
+{% if service_request.response %}
+    <h3>Previous Response:</h3>
+    <p>{{ service_request.response }}</p>
+{% else %}
+    <p>No response provided yet.</p>
+    
+<a href="{% url 'update_service_request' service_request.id %}">Update this request</a>
+
+{% endif %}
+{% endblock %}
