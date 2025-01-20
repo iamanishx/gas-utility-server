@@ -84,7 +84,7 @@ class ServiceRequestUpdateView(LoginRequiredMixin, UpdateView):
     context_object_name = 'service_request'
 
     def get_success_url(self):
-        return reverse_lazy('service_requests:list_service_requests')   
+        return reverse_lazy('list_service_requests')   
 
     def get_queryset(self):
         return ServiceRequest.objects.filter(customer=self.request.user.customer)   
