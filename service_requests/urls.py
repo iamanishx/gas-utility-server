@@ -19,13 +19,13 @@ from .views import ServiceRequestUpdateView
 # app_name = 'service_requests'
 
 urlpatterns = [
-    path('', lambda request: redirect('list_service_requests')),  # Redirect root URL to service-requests
+    path('', lambda request: redirect('list_service_requests')),   
     path('new/', views.ServiceRequestCreateView.as_view(), name='create_service_request'),
     path('service-requests/', views.ServiceRequestListView.as_view(), name='list_service_requests'),
     path('<int:pk>/', views.ServiceRequestDetailView.as_view(), name='service_request_detail'),
     path('signup/', views.signup, name='signup'),  
-    path('support-dashboard/', views.SupportDashboardView.as_view(), name='support_dashboard'),  # Use as_view() for class-based views
-    path('my-account/', views.my_account, name='my_account'),  # My Account page
+    path('support-dashboard/', views.SupportDashboardView.as_view(), name='support_dashboard'),   
+    path('my-account/', views.my_account, name='my_account'),   
     path('update/<int:pk>/', ServiceRequestUpdateView.as_view(), name='update_service_request'),
 
 ]
